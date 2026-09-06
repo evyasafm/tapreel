@@ -16,7 +16,7 @@
   ];
 
   const CUTS = ["cut-a", "cut-b", "cut-c", "cut-d"];
-  const MAX_PHOTOS = 6;
+  const SOFT_WARN_PHOTOS = 80;
   const XFADE = 0.45;
   const SOFT_FLASH = true;
 
@@ -25,7 +25,7 @@
 
   const state = {
     /** Ordered selection of photo ids */
-    selectedIds: [DEMO_ITEMS[0].id],
+    selectedIds: [],
     lookId: "cinema",
     playing: false,
     t0: 0,
@@ -122,11 +122,10 @@
     if (idx >= 0) {
       state.selectedIds.splice(idx, 1);
     } else {
-      if (state.selectedIds.length >= MAX_PHOTOS) {
-        toast("Max " + MAX_PHOTOS + " photos");
-        return;
-      }
       state.selectedIds.push(id);
+      if (state.selectedIds.length > SOFT_WARN_PHOTOS) {
+        toast("Large reel — may use more memory");
+      }
     }
     renderLibrary();
   }
@@ -149,14 +148,19 @@
       tile.addEventListener("click", () => toggleSelect(tile.dataset.photo));
     });
 
-    $("#continueStyle").disabled = state.selectedIds.length < 1;
+    const n = state.selectedIds.length;
+    $("#continueStyle").disabled = n < 1;
+    const countEl = $("#selectionCount");
+    if (countEl) {
+      countEl.textContent = n + " photo" + (n === 1 ? "" : "s") + " selected";
+    }
   }
 
-  function onCameraRoll(e) {
-    const files = Array.from(e.target.files || []);
-    if (!files.length) return;
+  function appendFiles(files) {
+    const list = Array.from(files || []);
+    if (!list.length) return 0;
     let added = 0;
-    files.forEach((file, i) => {
+    list.forEach((file, i) => {
       if (!file.type.startsWith("image/")) return;
       const id = "roll-" + Date.now() + "-" + i + "-" + Math.random().toString(36).slice(2, 7);
       const url = URL.createObjectURL(file);
@@ -165,13 +169,22 @@
         src: url,
         label: file.name.replace(/\.[^.]+$/, "") || "Photo",
       });
+      state.selectedIds.push(id);
       added++;
     });
-    e.target.value = "";
     if (added) {
-      toast(added === 1 ? "1 photo added" : added + " photos added");
+      toast(added + " photo" + (added === 1 ? "" : "s") + " ready");
+      if (state.selectedIds.length > SOFT_WARN_PHOTOS) {
+        setTimeout(() => toast("Large reel — may use more memory"), 2300);
+      }
       renderLibrary();
     }
+    return added;
+  }
+
+  function onFilePick(e) {
+    appendFiles(e.target.files);
+    e.target.value = "";
   }
 
   /* ---------- Style ---------- */
@@ -512,7 +525,10 @@
     $("#shareReels").addEventListener("click", () => shareNative("Reels"));
     $("#shareSave").addEventListener("click", saveImage);
 
-    $("#cameraRoll").addEventListener("change", onCameraRoll);
+    const libInput = $("#fileLibrary");
+    const camInput = $("#fileCamera");
+    if (libInput) libInput.addEventListener("change", onFilePick);
+    if (camInput) camInput.addEventListener("change", onFilePick);
 
     const scrub = $("#scrubber");
     scrub.addEventListener("input", () => {

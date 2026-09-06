@@ -25,7 +25,7 @@
       <div class="hero">
         <div>
           <h1>Make <span class="grad">AI Reel</span></h1>
-          <p class="sub">Your photos → one continuous reel</p>
+          <p class="sub">Upload any number of photos → one continuous reel</p>
         </div>
         <button type="button" class="cta-primary" data-go="library">Make AI Reel</button>
         <div class="sample-row" aria-label="Before and after sample">
@@ -51,13 +51,20 @@
         <span style="width:64px"></span>
       </div>
       <h2 class="screen-title">Pick photos</h2>
-      <p class="screen-sub">Tap in order — each continues the motion</p>
+      <p class="screen-sub">Add any number — order builds one continuous reel</p>
+      <div class="add-actions">
+        <label class="add-btn" id="addLibraryLabel">
+          <input type="file" id="fileLibrary" accept="image/*" multiple hidden />
+          <span class="add-btn-inner">Add from Library</span>
+        </label>
+        <label class="add-btn" id="addCameraLabel">
+          <input type="file" id="fileCamera" accept="image/*" capture="environment" hidden />
+          <span class="add-btn-inner">Take photo</span>
+        </label>
+      </div>
       <div class="photo-grid" id="photoGrid"></div>
-      <label class="from-roll" id="fromRollLabel">
-        <input type="file" id="cameraRoll" accept="image/*" multiple hidden />
-        <span class="from-roll-btn">+ From camera roll</span>
-      </label>
       <div class="bottom-cta">
+        <p class="selection-count" id="selectionCount">0 photos selected</p>
         <button type="button" class="cta-primary" id="continueStyle" disabled>Continue</button>
       </div>
     </section>
