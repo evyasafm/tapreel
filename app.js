@@ -17,8 +17,8 @@
 
   const CUTS = ["cut-a", "cut-b", "cut-c", "cut-d", "cut-e", "cut-f"];
   const SOFT_WARN_PHOTOS = 80;
-  const XFADE = 1.05;
-  const SOFT_FLASH = false;
+  const XFADE = 0.62;
+  const SOFT_FLASH = true; // warm light-leak + smear
 
   /** Session library: demos + camera-roll object URLs */
   const libraryItems = DEMO_ITEMS.map((i) => ({ ...i }));
@@ -63,8 +63,8 @@
   }
 
   function computeDuration(n) {
-    // ~2.8s per photo so 1.05s dissolve feels continuous, not a hard cut
-    return Math.max(7, n * 2.8);
+    // Punchy ~2.2s/photo — Vids-style fast morph bursts
+    return Math.max(6, n * 2.2);
   }
 
   function formatTime(t) {
@@ -275,9 +275,15 @@
   function softFlash() {
     if (!SOFT_FLASH) return;
     const flash = $("#flash");
+    const smear = $("#smear");
     flash.classList.remove("bang");
     void flash.offsetWidth;
     flash.classList.add("bang");
+    if (smear) {
+      smear.classList.remove("bang");
+      void smear.offsetWidth;
+      smear.classList.add("bang");
+    }
   }
 
   /**
@@ -298,6 +304,7 @@
     const incoming = layerEl(incomingWhich);
 
     document.documentElement.style.setProperty("--cut-dur", state.segmentLen + "s");
+    document.documentElement.style.setProperty("--xfade", XFADE + "s");
 
     incoming.src = photo.src;
     incoming.alt = photo.label || "Reel";
@@ -383,6 +390,7 @@
     state.segmentLen = state.duration / n;
 
     document.documentElement.style.setProperty("--cut-dur", state.segmentLen + "s");
+    document.documentElement.style.setProperty("--xfade", XFADE + "s");
 
     const scrub = $("#scrubber");
     scrub.max = String(state.duration);
@@ -575,7 +583,7 @@
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=4")
+      .register("sw.js?v=5")
       .then((reg) => {
         reg.update().catch(() => {});
       })

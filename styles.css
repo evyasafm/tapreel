@@ -15,7 +15,7 @@
   --radius-card: 20px;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
   --cut-dur: 2.2s;
-  --xfade: 1.05s;
+  --xfade: 0.62s;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -483,34 +483,34 @@ img { display: block; max-width: 100%; }
   transform-origin: center center;
   will-change: transform, opacity, filter;
   opacity: 0;
-  /* ease-in-out dissolve — Vids-like soft morph */
-  transition: opacity var(--xfade) cubic-bezier(0.4, 0, 0.2, 1),
-              filter var(--xfade) ease;
+  transition: opacity var(--xfade) cubic-bezier(0.22, 0.8, 0.25, 1),
+              filter calc(var(--xfade) * 0.85) ease-out;
   pointer-events: none;
-  filter: blur(0px);
+  filter: blur(0px) brightness(1);
 }
 .stage-img.on {
   opacity: 1;
   z-index: 2;
-  filter: blur(0px);
+  filter: blur(0px) brightness(1);
 }
 .stage-img.off {
   opacity: 0;
   z-index: 1;
-  filter: blur(0px);
+  filter: blur(0px) brightness(1);
 }
+/* Ghost / double-exposure exit + vertical smear feel via blur+stretch filter */
 .stage-img.xfading-out {
   opacity: 0;
-  z-index: 1;
-  filter: blur(6px);
+  z-index: 2;
+  mix-blend-mode: screen;
+  filter: blur(10px) brightness(1.35) saturate(1.4) contrast(1.1);
 }
 .stage-img.xfading-in {
   opacity: 1;
-  z-index: 2;
-  filter: blur(0px);
+  z-index: 3;
+  filter: blur(0px) brightness(1);
 }
 
-/* Continuous camera path — each cut starts where the previous ended */
 .stage-img.anim-idle { transform: scale(1); }
 .stage-img.cut-a,
 .stage-img.cut-b,
@@ -519,7 +519,7 @@ img { display: block; max-width: 100%; }
 .stage-img.cut-e,
 .stage-img.cut-f {
   animation-duration: var(--cut-dur);
-  animation-timing-function: linear; /* constant camera speed */
+  animation-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
   animation-fill-mode: forwards;
 }
 .stage-img.cut-a { animation-name: cutA; }
@@ -529,30 +529,30 @@ img { display: block; max-width: 100%; }
 .stage-img.cut-e { animation-name: cutE; }
 .stage-img.cut-f { animation-name: cutF; }
 
-/* Chained transforms so motion never "resets" between photos */
+/* Punchier push/zoom with vertical bias — Vids-style energy */
 @keyframes cutA {
-  0%   { transform: scale(1.00) translate(0%, 0%); }
-  100% { transform: scale(1.16) translate(-2.8%, -2.2%); }
+  0%   { transform: scale(1.05) translate(0%, 2%); }
+  100% { transform: scale(1.28) translate(-2%, -6%); }
 }
 @keyframes cutB {
-  0%   { transform: scale(1.16) translate(-2.8%, -2.2%); }
-  100% { transform: scale(1.30) translate(-4.5%, 1.5%); }
+  0%   { transform: scale(1.12) translate(0%, -3%); }
+  100% { transform: scale(1.36) translate(3%, 5%); }
 }
 @keyframes cutC {
-  0%   { transform: scale(1.30) translate(-4.5%, 1.5%); }
-  100% { transform: scale(1.42) translate(-1.5%, 4.0%); }
+  0%   { transform: scale(1.08) translate(-2%, 4%); }
+  100% { transform: scale(1.32) translate(2%, -7%); }
 }
 @keyframes cutD {
-  0%   { transform: scale(1.42) translate(-1.5%, 4.0%); }
-  100% { transform: scale(1.52) translate(3.0%, 1.2%); }
+  0%   { transform: scale(1.15) translate(3%, 0%); }
+  100% { transform: scale(1.4) translate(-3%, 6%); }
 }
 @keyframes cutE {
-  0%   { transform: scale(1.52) translate(3.0%, 1.2%); }
-  100% { transform: scale(1.38) translate(4.5%, -2.5%); }
+  0%   { transform: scale(1.1) translate(0%, 5%); }
+  100% { transform: scale(1.34) translate(-4%, -4%); }
 }
 @keyframes cutF {
-  0%   { transform: scale(1.38) translate(4.5%, -2.5%); }
-  100% { transform: scale(1.18) translate(1.0%, -3.5%); }
+  0%   { transform: scale(1.18) translate(2%, -2%); }
+  100% { transform: scale(1.42) translate(1%, 7%); }
 }
 
 .player-ui {
@@ -731,19 +731,51 @@ img { display: block; max-width: 100%; }
   transform: translateX(-50%) translateY(0);
 }
 
-.flash {
+/* Vertical motion smear streak */
+.smear {
   position: absolute;
-  inset: 0;
-  background: #fff;
+  inset: -10% 0;
   opacity: 0;
   pointer-events: none;
   z-index: 3;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    rgba(255, 255, 255, 0.07) 2px,
+    transparent 5px,
+    transparent 14px
+  );
+  mix-blend-mode: overlay;
+  filter: blur(1.5px);
+}
+.smear.bang {
+  animation: smearBurst 0.55s ease-out;
+}
+@keyframes smearBurst {
+  0%   { opacity: 0; transform: scaleY(0.7) translateY(8%); }
+  25%  { opacity: 0.85; transform: scaleY(1.45) translateY(-4%); }
+  100% { opacity: 0; transform: scaleY(1.8) translateY(-12%); }
+}
+
+/* Warm light-leak wash (Vids-style, not white cut flash) */
+.flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 180, 80, 0.75), transparent 55%),
+    radial-gradient(100% 70% at 90% 100%, rgba(255, 45, 85, 0.45), transparent 50%),
+    linear-gradient(180deg, rgba(255, 220, 160, 0.25), transparent 60%);
+  mix-blend-mode: screen;
 }
 .flash.bang {
-  animation: flashSoft 0.28s ease-out;
+  animation: lightLeak 0.58s ease-out;
 }
-@keyframes flashSoft {
-  0% { opacity: 0.22; }
+@keyframes lightLeak {
+  0%   { opacity: 0; }
+  18%  { opacity: 0.9; }
   100% { opacity: 0; }
 }
 

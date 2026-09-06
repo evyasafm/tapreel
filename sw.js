@@ -1,11 +1,11 @@
-const CACHE = "tapreel-v4";
+const CACHE = "tapreel-v5";
 const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
-  "./styles.css?v=4",
+  "./styles.css?v=5",
   "./app.js",
-  "./app.js?v=4",
+  "./app.js?v=5",
   "./manifest.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
