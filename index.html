@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <title>Tapreel</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
   <div class="app" id="app">
@@ -53,12 +53,12 @@
       <h2 class="screen-title">Pick photos</h2>
       <p class="screen-sub">Add any number — order builds one continuous reel</p>
       <div class="add-actions">
-        <label class="add-btn" id="addLibraryLabel">
-          <input type="file" id="fileLibrary" accept="image/*" multiple hidden />
+        <label class="add-btn" id="addLibraryLabel" for="fileLibrary">
+          <input type="file" id="fileLibrary" class="file-hit" accept="image/*,.heic,.heif" multiple />
           <span class="add-btn-inner">Add from Library</span>
         </label>
-        <label class="add-btn" id="addCameraLabel">
-          <input type="file" id="fileCamera" accept="image/*" capture="environment" hidden />
+        <label class="add-btn" id="addCameraLabel" for="fileCamera">
+          <input type="file" id="fileCamera" class="file-hit" accept="image/*,.heic,.heif" capture="environment" />
           <span class="add-btn-inner">Take photo</span>
         </label>
       </div>
@@ -140,6 +140,6 @@
 
     <div class="toast" id="toast" role="status"></div>
   </div>
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

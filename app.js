@@ -156,18 +156,36 @@
     }
   }
 
+  function isImageFile(file) {
+    if (!file) return false;
+    const t = (file.type || "").toLowerCase();
+    if (t.startsWith("image/")) return true;
+    // iOS Photos often sends empty type or HEIC/HEIF
+    if (t === "application/octet-stream" || !t) {
+      const name = file.name || "";
+      if (/\.(jpe?g|png|gif|webp|heic|heif|bmp|tiff?|avif)$/i.test(name)) return true;
+      // Camera / library pick with accept=image/* — trust the picker
+      return true;
+    }
+    return false;
+  }
+
   function appendFiles(files) {
     const list = Array.from(files || []);
     if (!list.length) return 0;
     let added = 0;
+    let skipped = 0;
     list.forEach((file, i) => {
-      if (!file.type.startsWith("image/")) return;
+      if (!isImageFile(file)) {
+        skipped++;
+        return;
+      }
       const id = "roll-" + Date.now() + "-" + i + "-" + Math.random().toString(36).slice(2, 7);
       const url = URL.createObjectURL(file);
       libraryItems.push({
         id,
         src: url,
-        label: file.name.replace(/\.[^.]+$/, "") || "Photo",
+        label: (file.name || "Photo").replace(/\.[^.]+$/, "") || "Photo",
       });
       state.selectedIds.push(id);
       added++;
@@ -178,13 +196,18 @@
         setTimeout(() => toast("Large reel — may use more memory"), 2300);
       }
       renderLibrary();
+    } else if (skipped) {
+      toast("Could not read those photos — try JPG/PNG");
     }
     return added;
   }
 
   function onFilePick(e) {
-    appendFiles(e.target.files);
+    const n = appendFiles(e.target.files);
     e.target.value = "";
+    if (!n && e.target.files && e.target.files.length === 0) {
+      // user cancelled — silent
+    }
   }
 
   /* ---------- Style ---------- */
@@ -545,9 +568,10 @@
   }
 
   if ("serviceWorker" in navigator) {
-    fetch("sw.js", { method: "HEAD" })
-      .then((r) => {
-        if (r.ok) navigator.serviceWorker.register("sw.js").catch(() => {});
+    navigator.serviceWorker
+      .register("sw.js?v=3")
+      .then((reg) => {
+        reg.update().catch(() => {});
       })
       .catch(() => {});
   }
