@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#0A0A0C" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Tapreel" />
+  <meta name="description" content="Your photos → cinematic reel in one tap" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <title>Tapreel</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <!-- HOME -->
+    <section class="screen" id="home" data-route="home">
+      <div class="top-bar">
+        <div class="logo"><span class="logo-mark" aria-hidden="true"></span> Tapreel</div>
+        <button type="button" class="nav-pill" data-go="library">Library</button>
+      </div>
+      <div class="hero">
+        <div>
+          <h1>Make <span class="grad">AI Reel</span></h1>
+          <p class="sub">Your photos → reel in one tap</p>
+        </div>
+        <button type="button" class="cta-primary" data-go="library">Make AI Reel</button>
+        <div class="sample-row" aria-label="Before and after sample">
+          <div class="sample-card">
+            <img src="items/scenic1.jpg" alt="Original photo" />
+            <span class="badge">Before</span>
+          </div>
+          <div class="sample-arrow" aria-hidden="true">→</div>
+          <div class="sample-card graded">
+            <img src="items/scenic1.jpg" alt="Styled reel frame" class="look-vivid" />
+            <span class="badge">After</span>
+          </div>
+        </div>
+        <p class="hint">6s · 9:16 · share to TikTok &amp; Reels</p>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section class="screen" id="library" data-route="library">
+      <div class="top-bar">
+        <button type="button" class="nav-pill" data-go="home">← Home</button>
+        <div class="logo"><span class="logo-mark" aria-hidden="true"></span> Tapreel</div>
+        <span style="width:64px"></span>
+      </div>
+      <h2 class="screen-title">Pick a photo</h2>
+      <p class="screen-sub">Tap one to style your reel</p>
+      <div class="photo-grid" id="photoGrid"></div>
+      <div class="bottom-cta">
+        <button type="button" class="cta-primary" id="continueStyle" disabled>Continue</button>
+      </div>
+    </section>
+
+    <!-- STYLE -->
+    <section class="screen" id="style" data-route="style">
+      <div class="top-bar">
+        <button type="button" class="nav-pill" data-go="library">← Photos</button>
+        <div class="logo"><span class="logo-mark" aria-hidden="true"></span> Tapreel</div>
+        <span style="width:72px"></span>
+      </div>
+      <h2 class="screen-title">Pick a look</h2>
+      <p class="screen-sub">Color grade + cinematic cuts</p>
+      <div class="style-preview-wrap">
+        <div class="preview-frame">
+          <span class="look-label pill" id="lookLabel">Cinema</span>
+          <img id="stylePreview" src="" alt="Selected photo preview" />
+        </div>
+        <div class="chips" id="lookChips" role="listbox" aria-label="Looks"></div>
+        <button type="button" class="cta-primary" id="makeReel">Make reel</button>
+      </div>
+    </section>
+
+    <!-- PLAY -->
+    <section class="screen" id="play" data-route="play">
+      <div class="player">
+        <div class="stage" id="stage">
+          <img class="stage-img" id="stageImg" src="" alt="Reel" />
+          <div class="flash" id="flash"></div>
+        </div>
+        <div class="player-ui">
+          <div class="player-top">
+            <button type="button" class="glass-btn" data-go="style">← Edit</button>
+            <span class="pill" style="padding:8px 12px;font-size:0.75rem;font-weight:600" id="playLookBadge">Cinema</span>
+          </div>
+          <div class="player-bottom">
+            <div class="scrubber-wrap">
+              <span class="time-label" id="timeNow">0:00</span>
+              <input type="range" class="scrubber" id="scrubber" min="0" max="6" step="0.01" value="0" aria-label="Timeline" />
+              <span class="time-label">0:06</span>
+            </div>
+            <div class="action-row">
+              <button type="button" class="glass-btn" id="btnNew" data-go="library">New</button>
+              <button type="button" class="cta-primary" id="btnShare">Share</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHARE (sheet over play) -->
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet" id="shareSheet" role="dialog" aria-labelledby="shareTitle" aria-hidden="true">
+      <div class="sheet-handle"></div>
+      <h3 id="shareTitle">Share reel</h3>
+      <div class="share-options">
+        <button type="button" class="share-opt tiktok" id="shareTikTok">
+          <span class="share-icon">♪</span>
+          <span>TikTok</span>
+        </button>
+        <button type="button" class="share-opt reels" id="shareReels">
+          <span class="share-icon">◎</span>
+          <span>Reels</span>
+        </button>
+        <button type="button" class="share-opt save" id="shareSave">
+          <span class="share-icon">↓</span>
+          <span>Save</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
