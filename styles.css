@@ -308,8 +308,6 @@ img { display: block; max-width: 100%; }
   position: relative;
   z-index: 1;
   pointer-events: none;
-}
-.add-btn-inner {
   display: flex;
   align-items: center;
   justify-content: center;
