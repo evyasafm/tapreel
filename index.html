@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Tapreel" />
-  <meta name="description" content="Your photos → cinematic reel in one tap" />
+  <meta name="description" content="Your photos → one continuous reel" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
@@ -25,7 +25,7 @@
       <div class="hero">
         <div>
           <h1>Make <span class="grad">AI Reel</span></h1>
-          <p class="sub">Your photos → reel in one tap</p>
+          <p class="sub">Your photos → one continuous reel</p>
         </div>
         <button type="button" class="cta-primary" data-go="library">Make AI Reel</button>
         <div class="sample-row" aria-label="Before and after sample">
@@ -39,7 +39,7 @@
             <span class="badge">After</span>
           </div>
         </div>
-        <p class="hint">6s · 9:16 · share to TikTok &amp; Reels</p>
+        <p class="hint">Continuous motion · 9:16 · share to TikTok &amp; Reels</p>
       </div>
     </section>
 
@@ -50,9 +50,13 @@
         <div class="logo"><span class="logo-mark" aria-hidden="true"></span> Tapreel</div>
         <span style="width:64px"></span>
       </div>
-      <h2 class="screen-title">Pick a photo</h2>
-      <p class="screen-sub">Tap one to style your reel</p>
+      <h2 class="screen-title">Pick photos</h2>
+      <p class="screen-sub">Tap in order — each continues the motion</p>
       <div class="photo-grid" id="photoGrid"></div>
+      <label class="from-roll" id="fromRollLabel">
+        <input type="file" id="cameraRoll" accept="image/*" multiple hidden />
+        <span class="from-roll-btn">+ From camera roll</span>
+      </label>
       <div class="bottom-cta">
         <button type="button" class="cta-primary" id="continueStyle" disabled>Continue</button>
       </div>
@@ -66,12 +70,13 @@
         <span style="width:72px"></span>
       </div>
       <h2 class="screen-title">Pick a look</h2>
-      <p class="screen-sub">Color grade + cinematic cuts</p>
+      <p class="screen-sub">Color grade + continuous cinematic motion</p>
       <div class="style-preview-wrap">
         <div class="preview-frame">
           <span class="look-label pill" id="lookLabel">Cinema</span>
           <img id="stylePreview" src="" alt="Selected photo preview" />
         </div>
+        <div class="preview-strip" id="previewStrip" aria-label="Selected photos"></div>
         <div class="chips" id="lookChips" role="listbox" aria-label="Looks"></div>
         <button type="button" class="cta-primary" id="makeReel">Make reel</button>
       </div>
@@ -81,7 +86,8 @@
     <section class="screen" id="play" data-route="play">
       <div class="player">
         <div class="stage" id="stage">
-          <img class="stage-img" id="stageImg" src="" alt="Reel" />
+          <img class="stage-img" id="stageImgA" src="" alt="" />
+          <img class="stage-img" id="stageImgB" src="" alt="" />
           <div class="flash" id="flash"></div>
         </div>
         <div class="player-ui">
@@ -93,7 +99,7 @@
             <div class="scrubber-wrap">
               <span class="time-label" id="timeNow">0:00</span>
               <input type="range" class="scrubber" id="scrubber" min="0" max="6" step="0.01" value="0" aria-label="Timeline" />
-              <span class="time-label">0:06</span>
+              <span class="time-label" id="timeEnd">0:06</span>
             </div>
             <div class="action-row">
               <button type="button" class="glass-btn" id="btnNew" data-go="library">New</button>

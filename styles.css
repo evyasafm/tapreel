@@ -14,6 +14,8 @@
   --radius-pill: 999px;
   --radius-card: 20px;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  --cut-dur: 2.2s;
+  --xfade: 0.45s;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -170,6 +172,10 @@ img { display: block; max-width: 100%; }
   transform: scale(0.98);
   box-shadow: 0 6px 20px var(--accent-glow);
 }
+.cta-primary:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
 
 .sample-row {
   display: grid;
@@ -256,20 +262,47 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 0 0 2px rgba(255,45,85,0.35);
 }
 .photo-tile:active { transform: scale(0.98); }
-.photo-tile .check {
+.photo-tile .seq-badge {
   position: absolute;
   top: 8px; right: 8px;
-  width: 24px; height: 24px;
+  min-width: 26px; height: 26px;
+  padding: 0 6px;
   border-radius: 50%;
   background: var(--accent);
   display: none;
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   box-shadow: 0 4px 12px var(--accent-glow);
 }
-.photo-tile.selected .check { display: flex; }
+.photo-tile.selected .seq-badge { display: flex; }
+
+.from-roll {
+  display: block;
+  margin-top: 14px;
+  cursor: pointer;
+}
+.from-roll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px dashed var(--glass-border);
+  background: var(--glass);
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.from-roll:hover .from-roll-btn,
+.from-roll:active .from-roll-btn {
+  color: var(--text);
+  border-color: rgba(255,45,85,0.45);
+  background: rgba(255,45,85,0.1);
+}
 
 .bottom-cta {
   margin-top: 20px;
@@ -282,13 +315,13 @@ img { display: block; max-width: 100%; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   min-height: 0;
 }
 .preview-frame {
   flex: 1;
-  min-height: 280px;
-  max-height: 52dvh;
+  min-height: 240px;
+  max-height: 46dvh;
   border-radius: 24px;
   overflow: hidden;
   position: relative;
@@ -308,6 +341,49 @@ img { display: block; max-width: 100%; }
   font-size: 0.75rem;
   font-weight: 600;
   z-index: 2;
+}
+
+.preview-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  min-height: 56px;
+}
+.preview-strip::-webkit-scrollbar { display: none; }
+.preview-strip:empty { display: none; }
+.strip-thumb {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 64px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: var(--bg-elevated);
+  position: relative;
+  opacity: 0.72;
+}
+.strip-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.strip-thumb.primary {
+  width: 56px;
+  height: 74px;
+  border-color: var(--accent);
+  opacity: 1;
+  box-shadow: 0 0 0 2px rgba(255,45,85,0.3);
+}
+.strip-thumb .strip-n {
+  position: absolute;
+  left: 4px; bottom: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(0,0,0,0.6);
 }
 
 .chips {
@@ -371,22 +447,41 @@ img { display: block; max-width: 100%; }
   height: 100%;
   object-fit: cover;
   transform-origin: center center;
-  will-change: transform, filter;
+  will-change: transform, opacity, filter;
+  opacity: 0;
+  transition: opacity var(--xfade) ease-in-out;
+  pointer-events: none;
+}
+.stage-img.on {
+  opacity: 1;
+  z-index: 2;
+}
+.stage-img.off {
+  opacity: 0;
+  z-index: 1;
+}
+.stage-img.xfading-out {
+  opacity: 0;
+  z-index: 1;
+}
+.stage-img.xfading-in {
+  opacity: 1;
+  z-index: 2;
 }
 
-/* Ken Burns / punch-in / pan cuts */
+/* Ken Burns / punch-in / pan cuts — duration from --cut-dur */
 .stage-img.anim-idle { transform: scale(1); }
 .stage-img.cut-a {
-  animation: cutA 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: cutA var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .stage-img.cut-b {
-  animation: cutB 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: cutB var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .stage-img.cut-c {
-  animation: cutC 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: cutC var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .stage-img.cut-d {
-  animation: cutD 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: cutD var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes cutA {
@@ -591,10 +686,10 @@ img { display: block; max-width: 100%; }
   z-index: 3;
 }
 .flash.bang {
-  animation: flashBang 0.18s ease-out;
+  animation: flashSoft 0.28s ease-out;
 }
-@keyframes flashBang {
-  0% { opacity: 0.55; }
+@keyframes flashSoft {
+  0% { opacity: 0.22; }
   100% { opacity: 0; }
 }
 
