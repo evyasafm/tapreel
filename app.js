@@ -15,10 +15,10 @@
     { id: "neon", name: "Night Neon", className: "look-neon" },
   ];
 
-  const CUTS = ["cut-a", "cut-b", "cut-c", "cut-d"];
+  const CUTS = ["cut-a", "cut-b", "cut-c", "cut-d", "cut-e", "cut-f"];
   const SOFT_WARN_PHOTOS = 80;
-  const XFADE = 0.45;
-  const SOFT_FLASH = true;
+  const XFADE = 1.05;
+  const SOFT_FLASH = false;
 
   /** Session library: demos + camera-roll object URLs */
   const libraryItems = DEMO_ITEMS.map((i) => ({ ...i }));
@@ -63,7 +63,8 @@
   }
 
   function computeDuration(n) {
-    return Math.max(6, n * 2.2);
+    // ~2.8s per photo so 1.05s dissolve feels continuous, not a hard cut
+    return Math.max(7, n * 2.8);
   }
 
   function formatTime(t) {
@@ -357,12 +358,17 @@
       updateScrubber(0);
     } else {
       state.elapsed = elapsed;
-      const seg = Math.min(
-        getSelectedPhotos().length - 1,
-        Math.floor(elapsed / state.segmentLen)
-      );
-      if (seg !== state.segmentIndex) {
-        showSegment(seg, true);
+      const nPhotos = getSelectedPhotos().length;
+      // Start crossfade before segment ends so photos morph mid-motion
+      const lead = Math.min(XFADE * 0.55, state.segmentLen * 0.4);
+      let nextSeg = 0;
+      for (let i = 0; i < nPhotos; i++) {
+        const start = i * state.segmentLen;
+        if (elapsed + lead >= start) nextSeg = i;
+      }
+      nextSeg = Math.min(nPhotos - 1, nextSeg);
+      if (nextSeg !== state.segmentIndex) {
+        showSegment(nextSeg, true);
       }
       updateScrubber(elapsed);
     }
@@ -569,7 +575,7 @@
 
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=3")
+      .register("sw.js?v=4")
       .then((reg) => {
         reg.update().catch(() => {});
       })

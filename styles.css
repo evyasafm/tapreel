@@ -15,7 +15,7 @@
   --radius-card: 20px;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
   --cut-dur: 2.2s;
-  --xfade: 0.45s;
+  --xfade: 1.05s;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -483,56 +483,76 @@ img { display: block; max-width: 100%; }
   transform-origin: center center;
   will-change: transform, opacity, filter;
   opacity: 0;
-  transition: opacity var(--xfade) ease-in-out;
+  /* ease-in-out dissolve — Vids-like soft morph */
+  transition: opacity var(--xfade) cubic-bezier(0.4, 0, 0.2, 1),
+              filter var(--xfade) ease;
   pointer-events: none;
+  filter: blur(0px);
 }
 .stage-img.on {
   opacity: 1;
   z-index: 2;
+  filter: blur(0px);
 }
 .stage-img.off {
   opacity: 0;
   z-index: 1;
+  filter: blur(0px);
 }
 .stage-img.xfading-out {
   opacity: 0;
   z-index: 1;
+  filter: blur(6px);
 }
 .stage-img.xfading-in {
   opacity: 1;
   z-index: 2;
+  filter: blur(0px);
 }
 
-/* Ken Burns / punch-in / pan cuts — duration from --cut-dur */
+/* Continuous camera path — each cut starts where the previous ended */
 .stage-img.anim-idle { transform: scale(1); }
-.stage-img.cut-a {
-  animation: cutA var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+.stage-img.cut-a,
+.stage-img.cut-b,
+.stage-img.cut-c,
+.stage-img.cut-d,
+.stage-img.cut-e,
+.stage-img.cut-f {
+  animation-duration: var(--cut-dur);
+  animation-timing-function: linear; /* constant camera speed */
+  animation-fill-mode: forwards;
 }
-.stage-img.cut-b {
-  animation: cutB var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.stage-img.cut-c {
-  animation: cutC var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.stage-img.cut-d {
-  animation: cutD var(--cut-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
+.stage-img.cut-a { animation-name: cutA; }
+.stage-img.cut-b { animation-name: cutB; }
+.stage-img.cut-c { animation-name: cutC; }
+.stage-img.cut-d { animation-name: cutD; }
+.stage-img.cut-e { animation-name: cutE; }
+.stage-img.cut-f { animation-name: cutF; }
 
+/* Chained transforms so motion never "resets" between photos */
 @keyframes cutA {
-  0% { transform: scale(1) translate(0, 0); }
-  100% { transform: scale(1.35) translate(-4%, -3%); }
+  0%   { transform: scale(1.00) translate(0%, 0%); }
+  100% { transform: scale(1.16) translate(-2.8%, -2.2%); }
 }
 @keyframes cutB {
-  0% { transform: scale(1.15) translate(6%, 2%); }
-  100% { transform: scale(1.45) translate(-2%, 5%); }
+  0%   { transform: scale(1.16) translate(-2.8%, -2.2%); }
+  100% { transform: scale(1.30) translate(-4.5%, 1.5%); }
 }
 @keyframes cutC {
-  0% { transform: scale(1.2) translate(-8%, 0); }
-  100% { transform: scale(1.5) translate(3%, -6%); }
+  0%   { transform: scale(1.30) translate(-4.5%, 1.5%); }
+  100% { transform: scale(1.42) translate(-1.5%, 4.0%); }
 }
 @keyframes cutD {
-  0% { transform: scale(1.1) translate(0, 4%); }
-  100% { transform: scale(1.4) translate(-5%, -2%); }
+  0%   { transform: scale(1.42) translate(-1.5%, 4.0%); }
+  100% { transform: scale(1.52) translate(3.0%, 1.2%); }
+}
+@keyframes cutE {
+  0%   { transform: scale(1.52) translate(3.0%, 1.2%); }
+  100% { transform: scale(1.38) translate(4.5%, -2.5%); }
+}
+@keyframes cutF {
+  0%   { transform: scale(1.38) translate(4.5%, -2.5%); }
+  100% { transform: scale(1.18) translate(1.0%, -3.5%); }
 }
 
 .player-ui {
